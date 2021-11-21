@@ -30,7 +30,7 @@ public class UetCoursesAuthRoute extends RouteBuilder {
 					  + "&wsfunction=core_webservice_get_site_info"))
 			.to("https://courses.uet.vnu.edu.vn/webservice/rest/server.php?moodlewsrestformat=json&bridgeEndpoint=true")
 			.unmarshal(new JacksonDataFormat(UetAuthInfo.class))
-			.to("log:com.team2.routes?level=INFO")
+			.marshal(new JacksonDataFormat(UetAuthInfo.class))
 			.to("direct:rest-response/success");
 	}
 

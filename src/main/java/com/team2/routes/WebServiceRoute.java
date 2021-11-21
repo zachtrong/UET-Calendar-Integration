@@ -14,6 +14,8 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
 import org.apache.commons.io.IOUtils;
 
+import com.team2.model.GoogleAuthToken;
+
 public class WebServiceRoute extends RouteBuilder {
 
 	@Override
@@ -54,5 +56,11 @@ public class WebServiceRoute extends RouteBuilder {
 		
 		rest("/rest")
 			.post("/uet-auth").to("direct:uet-auth");
+		
+		rest("/rest")
+			.post("/google-auth").to("direct:google-auth");
+		
+		rest("/rest")
+			.post("/microsoft-auth").to("direct:microsoft-auth");
 	}
 }

@@ -13,12 +13,13 @@ public class RestResponseFailureRoute extends RouteBuilder {
 
 			@Override
 			public void process(Exchange exchange) throws Exception {
-				// TODO Auto-generated method stub
 				exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, 406);
 				exchange.getMessage().setHeader(Exchange.CONTENT_TYPE, constant("application/json"));
 				exchange.getMessage().setBody("{\"status\": \"Failure\"}");	
 			} 
-		  });
+		  })
+		.convertBodyTo(String.class, "UTF-8")
+		.to("log:com.team2.routes?level=INFO");
 	}
 
 }

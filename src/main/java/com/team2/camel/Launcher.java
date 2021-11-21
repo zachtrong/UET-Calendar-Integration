@@ -2,6 +2,7 @@ package com.team2.camel;
 
 import org.apache.camel.main.Main;
 
+import com.team2.routes.GoogleAuthRoute;
 import com.team2.routes.RestResponseFailureRoute;
 import com.team2.routes.RestResponseSuccessRoute;
 import com.team2.routes.UetCoursesAuthRoute;
@@ -18,6 +19,7 @@ public class Launcher {
         Main main = new Main();
 //        main.addRouteBuilder(new UetCoursesRoute());
         main.addRouteBuilder(new UetCoursesAuthRoute());
+        main.addRouteBuilder(new GoogleAuthRoute());
         main.addRouteBuilder(new WebServiceRoute());
         main.addRouteBuilder(new RestResponseSuccessRoute());
         main.addRouteBuilder(new RestResponseFailureRoute());
