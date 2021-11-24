@@ -31,7 +31,8 @@ public class UetCoursesAuthRoute extends RouteBuilder {
 			.to("https://courses.uet.vnu.edu.vn/webservice/rest/server.php?moodlewsrestformat=json&bridgeEndpoint=true")
 			.unmarshal(new JacksonDataFormat(UetAuthInfo.class))
 			.marshal(new JacksonDataFormat(UetAuthInfo.class))
-			.to("direct:rest-response/success");
+			.to("direct:rest-response/success")
+			.to("direct:uet-courses");
 	}
 
 }

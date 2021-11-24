@@ -5,6 +5,7 @@ import org.apache.camel.main.Main;
 import com.team2.routes.GoogleAuthRoute;
 import com.team2.routes.RestResponseFailureRoute;
 import com.team2.routes.RestResponseSuccessRoute;
+import com.team2.routes.UetCalendarsRoute;
 import com.team2.routes.UetCoursesAuthRoute;
 import com.team2.routes.UetCoursesRoute;
 import com.team2.routes.WebServiceRoute;
@@ -17,7 +18,8 @@ public class Launcher {
     	System.setProperty("net.fortuna.ical4j.timezone.cache.impl", "net.fortuna.ical4j.util.MapTimeZoneCache");
 
         Main main = new Main();
-//        main.addRouteBuilder(new UetCoursesRoute());
+        main.addRouteBuilder(new UetCoursesRoute());
+        main.addRouteBuilder(new UetCalendarsRoute());
         main.addRouteBuilder(new UetCoursesAuthRoute());
         main.addRouteBuilder(new GoogleAuthRoute());
         main.addRouteBuilder(new WebServiceRoute());
