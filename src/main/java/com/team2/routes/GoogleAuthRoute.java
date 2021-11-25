@@ -65,7 +65,7 @@ public class GoogleAuthRoute extends RouteBuilder {
 				}
 			})
 			.marshal(new JacksonDataFormat(GoogleAuthToken.class))
-			.to("direct:rest-response/success");	
+			.to("direct:rest-response/success", "file:src/data/?fileName=google_auth.json");	
 	}
 
 }
