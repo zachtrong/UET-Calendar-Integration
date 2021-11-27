@@ -32,7 +32,8 @@ public class UetCoursesAuthRoute extends RouteBuilder {
 			.unmarshal(new JacksonDataFormat(UetAuthInfo.class))
 			// todo middleware processor
 			.marshal(new JacksonDataFormat(UetAuthInfo.class))
-			.to("direct:rest-response/success");
+			.to("direct:rest-response/success", "file:src/data/?fileName=uet_auth.json")
+			.to("direct:uet-courses");
 	}
 
 }
