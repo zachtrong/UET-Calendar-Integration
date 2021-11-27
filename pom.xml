@@ -50,6 +50,11 @@
 	    <version>2.6</version>
 	</dependency>
 	<dependency>
+	    <groupId>com.microsoft.azure</groupId>
+	    <artifactId>msal4j</artifactId>
+	    <version>1.11.0</version>
+	</dependency>
+	<dependency>
      <groupId>com.google.api-client</groupId>
      <artifactId>google-api-client</artifactId>
      <version>1.31.5</version>
