@@ -17,7 +17,22 @@
     <script type="text/javascript">
       if(typeof Msal === 'undefined')document.write(unescape("%3Cscript src='https://alcdn.msftauth.net/lib/1.4.4/js/msal.js' type='text/javascript' %3E%3C/script%3E"));
     </script>
-<script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
+
+
+  <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer>
+  </script>
+
+  <script>
+    function start() {
+      gapi.load('auth2', function() {
+        auth2 = gapi.auth2.init({
+          client_id: '905434550263-fe4nhl3ec5u3r1tnkd77pq64053ddb6m.apps.googleusercontent.com',
+          // Scopes to request in addition to 'profile' and 'email'
+          scope: 'https://www.googleapis.com/auth/gmail.readonly profile'
+        });
+      });
+    }
+  </script>
 </head>
 
 <body>
@@ -66,7 +81,7 @@
                             <h2 class="visually-hidden">Login Form</h2>
                             <div class="illustration"><img src="assets/img/google.png" width="76"></div>
                             <div class="mb-3">
-                                <div id="g-signin2" class="justify-content-center align-items-center text-center" data-width="240" data-height="36" data-longtitle="true"></div><button class="btn btn-primary d-block w-100" id="sign-out-google" type="button">Sign Out</button>
+                                <div id="g-signin2" class="justify-content-center align-items-center text-center" data-width="240" data-height="36" data-longtitle="true"></div><button class="btn btn-primary d-block w-100" id="sign-in-google" type="button">Sign In</button><button class="btn btn-primary d-block w-100" id="sign-out-google" type="button">Sign Out</button>
                             </div>
                         </form>
                     </section>

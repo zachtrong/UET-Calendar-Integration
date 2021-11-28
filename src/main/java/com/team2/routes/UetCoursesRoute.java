@@ -14,7 +14,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.team2.model.Course;
-import com.team2.processor.UetCoursesProcessor;
 
 public class UetCoursesRoute extends RouteBuilder {
 

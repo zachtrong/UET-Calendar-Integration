@@ -3,19 +3,19 @@ package com.team2.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GoogleAuthToken {
-	@JsonProperty("id_token")
-	private String idToken;
+	@JsonProperty("code")
+	private String code;
 
-	public String getIdToken() {
-		return idToken;
+	public String getCode() {
+		return code;
 	}
-
-	public void setIdToken(String idToken) {
-		this.idToken = idToken;
+	
+	public void setCode(String code) {
+		this.code = code;
 	}
-
+	
 	@Override
 	public String toString() {
-		return "GoogleAuthToken [idToken=" + idToken + "]";
+		return "GoogleAuthToken [code=" + code + "]";
 	}
 }

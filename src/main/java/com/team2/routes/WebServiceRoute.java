@@ -18,6 +18,8 @@ import com.team2.model.GoogleAuthToken;
 
 public class WebServiceRoute extends RouteBuilder {
 
+	public static final String HOSTNAME = "https://zachtrong.com:4444";
+	
 	@Override
 	public void configure() throws Exception {
 		restConfiguration().component("jetty").host("0.0.0.0").port(8080).bindingMode(RestBindingMode.off);
@@ -39,7 +41,7 @@ public class WebServiceRoute extends RouteBuilder {
 		                relativepath = "index.html";
 		            }
 
-		            final String formattedPath = String.format("%s", relativepath);
+		            final String formattedPath = String.format("static/%s", relativepath);
 
 		            Message out = exchange.getOut();
 		            try {

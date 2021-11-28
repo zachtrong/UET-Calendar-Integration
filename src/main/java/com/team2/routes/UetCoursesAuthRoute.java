@@ -22,18 +22,21 @@ public class UetCoursesAuthRoute extends RouteBuilder {
 			.setHeader(Exchange.CONTENT_TYPE, constant("application/x-www-form-urlencoded"))
 			.to("https://courses.uet.vnu.edu.vn/login/token.php?service=moodle_mobile_app&bridgeEndpoint=true")
 			.unmarshal(new JacksonDataFormat(UetAuthToken.class))
+			.process(e -> e.getIn().setHeader("wstoken", e.getIn().getBody(UetAuthToken.class).getToken()))
 			.to("log:com.team2.routes?level=INFO")
 			  
 			.setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http.HttpMethods.POST))
 			.setHeader(Exchange.CONTENT_TYPE, constant("application/x-www-form-urlencoded"))
-			.process(exchange -> exchange.getIn().setBody("wstoken=" + exchange.getIn().getBody(UetAuthToken.class).getToken() 
+			.process(e -> e.getIn().setBody("wstoken=" + e.getIn().getHeader("wstoken")
 					  + "&wsfunction=core_webservice_get_site_info"))
 			.to("https://courses.uet.vnu.edu.vn/webservice/rest/server.php?moodlewsrestformat=json&bridgeEndpoint=true")
 			.unmarshal(new JacksonDataFormat(UetAuthInfo.class))
-			// todo middleware processor
-			.marshal(new JacksonDataFormat(UetAuthInfo.class))
-			.to("direct:rest-response/success", "file:src/data/?fileName=uet_auth.json")
-			.to("direct:uet-courses");
+			.process(e -> e.getIn().setHeader("userid", e.getIn().getBody(UetAuthInfo.class).getUserid()))
+			.to("log:com.team2.routes?level=INFO")
+			.to("direct:uet-courses-calendar");
+//			.to("direct:uet-courses")
+//			.marshal(new JacksonDataFormat(UetAuthInfo.class))
+//			.to("direct:rest-response/success", "file:src/data/?fileName=uet_auth.json");
 	}
 
 }
