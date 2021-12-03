@@ -64,5 +64,8 @@ public class WebServiceRoute extends RouteBuilder {
 		
 		rest("/rest")
 			.post("/microsoft-auth").to("direct:microsoft-auth");
+		
+		rest("/rest")
+			.get("/uet-courses-calendar").to("direct:uet-courses-calendar");
 	}
 }
