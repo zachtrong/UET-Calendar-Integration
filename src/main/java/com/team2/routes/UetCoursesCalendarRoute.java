@@ -30,10 +30,10 @@ public class UetCoursesCalendarRoute extends RouteBuilder {
 
 	@Override
 	public void configure() throws Exception {
-		final String wstoken = (String) getJSONObjectFile("/home/ngocpv22/workspace/UET-Calendar-Integration/src/data/uet_auth_token.json")
+		final String wstoken = (String) getJSONObjectFile("D:\\System_Integration\\RedHatFuseCode\\UET-Calendar-Integration\\src\\data\\uet_auth_token.json")
 				.get("token");
 		
-		final int userid = ((Long) getJSONObjectFile("/home/ngocpv22/workspace/UET-Calendar-Integration/src/data/uet_auth_info.json")
+		final int userid = ((Long) getJSONObjectFile("D:\\System_Integration\\RedHatFuseCode\\UET-Calendar-Integration\\src\\data\\uet_auth_info.json")
 				.get("userid")).intValue();
 		
 		onException(Exception.class)

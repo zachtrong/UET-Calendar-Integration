@@ -67,5 +67,9 @@ public class WebServiceRoute extends RouteBuilder {
 		
 		rest("/rest")
 			.get("/uet-courses-calendar").to("direct:uet-courses-calendar");
+		rest("/rest")
+			.get("/google-gmail").to("direct:google-gmail");
+		rest("/rest")
+			.get("/google-calendar").to("direct:google-calendar");
 	}
 }
