@@ -69,14 +69,14 @@ public class UetCoursesCalendarRoute extends RouteBuilder {
 					if(arrayEvent[i].contains("METHOD:PUBLISH")) continue;
 					
 					String title = getValueByStringRegexFromEventUETCourses("SUMMARY:", arrayEvent[i]);
-					String description = getValueByStringRegexFromEventUETCourses("DESCRIPTION:", arrayEvent[i]);
-					String timeStart = getValueByStringRegexFromEventUETCourses("DTSTART:", arrayEvent[i]);
-					String timeEnd = getValueByStringRegexFromEventUETCourses("DTEND:", arrayEvent[i]);
+//					String description = getValueByStringRegexFromEventUETCourses("DESCRIPTION:", arrayEvent[i]);
+					String start = getValueByStringRegexFromEventUETCourses("DTSTART:", arrayEvent[i]);
+					String end = getValueByStringRegexFromEventUETCourses("DTEND:", arrayEvent[i]);
 					
-					timeStart = formatTimeFromEventUETCourses(timeStart);
-					timeEnd = formatTimeFromEventUETCourses(timeEnd);
+					start = formatTimeFromEventUETCourses(start);
+					end = formatTimeFromEventUETCourses(end);
 					
-					Event event = new Event(title, description, timeStart, timeEnd);
+					Event event = new Event(title, start, end);
 					Gson gson = new Gson();
 					String jsonObjectEvent = gson.toJson(event);
 					
@@ -119,6 +119,7 @@ public class UetCoursesCalendarRoute extends RouteBuilder {
         String minutes = time.substring(11, 13);
         String second = time.substring(13, 15);
 
-        return year + "-" + month + "-" + day + " " + hour + ":" + minutes + ":" + second;
+//        return year + "-" + month + "-" + day + " " + hour + ":" + minutes + ":" + second;
+        return year + "-" + month + "-" + day;
     }
 }

@@ -2,19 +2,19 @@ package com.team2.model;
 
 public class Event {
 	private String title;
-	private String description;
-	private String timeStart;
-	private String timeEnd;
+//	private String description;
+	private String start;
+	private String end;
 	
 	public Event() {
 		
 	}
 	
-	public Event(String title, String description, String timeStart, String timeEnd) {
+	public Event(String title, String start, String end) {
 		this.title = title;
-		this.description = description;
-		this.timeStart = timeStart;
-		this.timeEnd = timeEnd;
+//		this.description = description;
+		this.start = start;
+		this.end = end;
 	}
 	
 	public void setTitle(String title) {
@@ -24,22 +24,22 @@ public class Event {
 		return title;
 	}
 	
-	public void setDescription(String description) {
-		this.description = description;
+//	public void setDescription(String description) {
+//		this.description = description;
+//	}
+//	public String getDescription() {
+//		return description;
+//	}
+	public void setStart(String timeStart) {
+		this.start = timeStart;
 	}
-	public String getDescription() {
-		return description;
+	public String getStart() {
+		return start;
 	}
-	public void setTimeStart(String timeStart) {
-		this.timeStart = timeStart;
+	public void setEnd(String timeEnd) {
+		this.end = timeEnd;
 	}
-	public String getTimeStart() {
-		return timeStart;
-	}
-	public void setTimeEnd(String timeEnd) {
-		this.timeEnd = timeEnd;
-	}
-	public String getTimeEnd() {
-		return timeEnd;
+	public String getEnd() {
+		return end;
 	}
 }
