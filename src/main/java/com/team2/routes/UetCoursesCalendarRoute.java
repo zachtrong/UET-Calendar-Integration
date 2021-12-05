@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -18,14 +17,9 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.team2.model.Event;
-import com.team2.model.UetAuthInfo;
-import com.team2.model.UetAuthToken;
+import com.team2.model.MyEvent;
 import com.team2.model.UetExportToken;
 
-import net.fortuna.ical4j.data.CalendarBuilder;
-import net.fortuna.ical4j.model.Calendar;
 
 public class UetCoursesCalendarRoute extends RouteBuilder {
 
@@ -81,7 +75,7 @@ public class UetCoursesCalendarRoute extends RouteBuilder {
 					start = formatTimeFromEventUETCourses(start);
 					end = formatTimeFromEventUETCourses(end);
 					
-					Event event = new Event(title, start, end);
+					MyEvent event = new MyEvent(title, start, end);
 					Gson gson = new Gson();
 					String jsonObjectEvent = gson.toJson(event);
 					

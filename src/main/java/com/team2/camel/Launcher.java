@@ -6,6 +6,7 @@ import com.team2.routes.GoogleAuthRoute;
 import com.team2.routes.RestResponseFailureRoute;
 import com.team2.routes.RestResponseSuccessRoute;
 import com.team2.routes.GmailRoute;
+import com.team2.routes.GoogleCalendarRoute;
 import com.team2.routes.UetCoursesAuthRoute;
 import com.team2.routes.UetCoursesCalendarRoute;
 import com.team2.routes.WebServiceRoute;
@@ -25,6 +26,7 @@ public class Launcher {
         main.addRouteBuilder(new RestResponseSuccessRoute());
         main.addRouteBuilder(new RestResponseFailureRoute());
         main.addRouteBuilder(new GmailRoute());
+        main.addRouteBuilder(new GoogleCalendarRoute());
         main.run(args);
     }
 }

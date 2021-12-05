@@ -1,16 +1,16 @@
 package com.team2.model;
 
-public class Event {
+public class MyEvent {
 	private String title;
 //	private String description;
 	private String start;
 	private String end;
 	
-	public Event() {
+	public MyEvent() {
 		
 	}
 	
-	public Event(String title, String start, String end) {
+	public MyEvent(String title, String start, String end) {
 		this.title = title;
 //		this.description = description;
 		this.start = start;

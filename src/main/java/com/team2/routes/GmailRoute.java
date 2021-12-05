@@ -3,7 +3,10 @@ package com.team2.routes;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.camel.builder.RouteBuilder;
 
@@ -13,9 +16,13 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.ListMessagesResponse;
 import com.google.api.services.gmail.model.Message;
+import com.google.gson.Gson;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
+import com.team2.model.MyEvent;
 
 
 public class GmailRoute extends RouteBuilder {
@@ -24,6 +31,16 @@ public class GmailRoute extends RouteBuilder {
 	private static final NetHttpTransport NET_HTTP_TRANSPORT = new NetHttpTransport();
 	private static final GsonFactory GSON_FACTORY = GsonFactory.getDefaultInstance();
 	private static final String APPLICATION_NAME = "Gmail Route";
+	
+	public static List<String> getDate(String mail) {
+        Matcher m = Pattern.compile("(\\d{4}-\\d{1,2}-\\d{1,2})", Pattern.CASE_INSENSITIVE).matcher(mail);
+        List<String> dates = new ArrayList<String>();
+        while (m.find()) {
+            dates.add(m.group(1));
+//            System.out.println(m.group(1));
+        }
+        return dates;
+    }
 	
 	public static JSONObject getJSONObjectFile(String path) throws FileNotFoundException, IOException, ParseException {
 		
@@ -41,7 +58,7 @@ public class GmailRoute extends RouteBuilder {
 	public void configure() throws Exception {
 		final String accessToken = (String) getJSONObjectFile("D:\\System_Integration\\RedHatFuseCode\\UET-Calendar-Integration\\src\\data\\google_auth.json")
 				.get("token");
-		
+//		final String accessToken = "ya29.a0ARrdaM_3wBntL17-aCFW31ALq3BjW_SOufgpJ85_wI-8Sq3rB-4Oe2q1cK-OwiD6CjHfScctIlK3o4QxnphtD2v4byJXsDklMHDbp5g2YqWpmJ7Yx7-oksVngJD9vWhMsh5i9yoXFkaAXGSEqHwrsyNGmxlg";
 		onException(Exception.class)
 		.handled(true)
 		.to("direct:rest-response/failure");
@@ -63,10 +80,34 @@ public class GmailRoute extends RouteBuilder {
 		        System.out.println("No messages found.");
 		    } else {
 		        System.out.println("Messages:");
+		        List<String> listEvents = new ArrayList<>();
 		        for (Message message : messages) {
 		        	Message detail = service.users().messages().get("me", message.getId()).setFormat("full").execute();
 		            System.out.printf("- %s\n", detail.getSnippet());
+		            List<String> dates = getDate(detail.getSnippet());
+		            if (dates.size() == 1) {
+		                String end_time = dates.get(0);
+		                MyEvent event = new MyEvent("Date from gmail", end_time, end_time);
+		                Gson gson = new Gson();
+						String jsonObjectEvent = gson.toJson(event);
+		                listEvents.add(jsonObjectEvent);
+		                System.out.println(end_time);
+		            }
+		            else if(dates.size() >= 2) {
+		                String start_time = dates.get(0);
+		                String end_time = dates.get(1);
+		                System.out.println(start_time);
+		                System.out.println(end_time);
+		                MyEvent event = new MyEvent("Date from gmail", start_time, end_time);
+		                Gson gson = new Gson();
+						String jsonObjectEvent = gson.toJson(event);
+		                listEvents.add(jsonObjectEvent);
+		            }
+		            else {
+		                System.out.println("Khong co ngay thang trong mail");
+		            }
 		        }
+		        e.getOut().setBody(listEvents);
 		    }
 		})
 		.to("log:com.team2.routes?level=INFO");

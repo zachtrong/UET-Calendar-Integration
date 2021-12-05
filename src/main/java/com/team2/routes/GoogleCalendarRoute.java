@@ -3,6 +3,7 @@ package com.team2.routes;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.camel.builder.RouteBuilder;
@@ -14,11 +15,12 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import com.google.api.client.util.DateTime;
-import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.Calendar;
-import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
+import com.google.gson.Gson;
+
+import com.team2.model.MyEvent;
 
 
 public class GoogleCalendarRoute extends RouteBuilder {
@@ -66,6 +68,7 @@ public class GoogleCalendarRoute extends RouteBuilder {
 		            .setSingleEvents(true)
 		            .execute();
 		    List<Event> items = events.getItems();
+		    List<String> listEvents = new ArrayList<>();
 		    if (items.isEmpty()) {
 		        System.out.println("No upcoming events found.");
 		    } else {
@@ -75,9 +78,17 @@ public class GoogleCalendarRoute extends RouteBuilder {
 		            if (start == null) {
 		                start = event.getStart().getDate();
 		            }
-		            System.out.printf("%s (%s)\n", event.getSummary(), start);
-		        }
-    }
+		            DateTime end = event.getEnd().getDateTime();
+		            if (end == null) {
+		                end = event.getStart().getDate();
+		            }
+		            MyEvent _event = new MyEvent(event.getSummary(), start.toString().split("T")[0], end.toString().split("T")[0]);
+	                Gson gson = new Gson();
+					String jsonObjectEvent = gson.toJson(_event);
+	                listEvents.add(jsonObjectEvent);
+		        }     
+		        e.getOut().setBody(listEvents);
+		    }
 		})
 		.to("log:com.team2.routes?level=INFO");
 	}
