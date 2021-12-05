@@ -1,5 +1,6 @@
 package com.team2.routes;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -30,11 +31,6 @@ public class UetCoursesCalendarRoute extends RouteBuilder {
 
 	@Override
 	public void configure() throws Exception {
-		final String wstoken = (String) getJSONObjectFile("D:\\System_Integration\\RedHatFuseCode\\UET-Calendar-Integration\\src\\data\\uet_auth_token.json")
-				.get("token");
-		
-		final int userid = ((Long) getJSONObjectFile("D:\\System_Integration\\RedHatFuseCode\\UET-Calendar-Integration\\src\\data\\uet_auth_info.json")
-				.get("userid")).intValue();
 		
 		onException(Exception.class)
 			.handled(true)
@@ -44,10 +40,11 @@ public class UetCoursesCalendarRoute extends RouteBuilder {
 		from("direct:uet-courses-calendar")
 			.setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http.HttpMethods.POST))
 			.setHeader(Exchange.CONTENT_TYPE, constant("application/x-www-form-urlencoded"))
-			
-			.process(e -> e.getIn().setBody("wstoken=" + wstoken
-					  + "&wsfunction=core_calendar_get_calendar_export_token"))
-			
+			.process(e -> {
+				String wstoken = (String) getJSONObjectFile("D:\\System_Integration\\RedHatFuseCode\\UET-Calendar-Integration\\src\\data\\uet_auth_token.json")
+						.get("token");
+				e.getIn().setBody("wstoken=" + wstoken + "&wsfunction=core_calendar_get_calendar_export_token");
+			})
 			.to("https://courses.uet.vnu.edu.vn/webservice/rest/server.php?moodlewsrestformat=json&bridgeEndpoint=true")
 			.unmarshal(new JacksonDataFormat(UetExportToken.class))
 			.process(e -> 
@@ -56,10 +53,18 @@ public class UetCoursesCalendarRoute extends RouteBuilder {
 			})
 			.setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http.HttpMethods.GET))
 			.to("log:com.team2.routes?level=INFO")
-			.setBody(p -> "")
-			.toD("https://courses.uet.vnu.edu.vn/calendar/export_execute.php?userid=" + userid + "&authtoken=${header.exporttoken}&preset_what=all&preset_time=monthnow&bridgeEndpoint=true")
 			.process(e -> {
+				int userid = ((Long) getJSONObjectFile("D:\\System_Integration\\RedHatFuseCode\\UET-Calendar-Integration\\src\\data\\uet_auth_info.json")
+						.get("userid")).intValue();
+				e.getIn().setBody("userid=" + userid + "&");
+			})
+			.to("https://courses.uet.vnu.edu.vn/calendar/export_execute.php?authtoken=${header.exporttoken}&preset_what=all&preset_time=monthnow&bridgeEndpoint=true")
+			.process(e -> {
+//				String filePath = new File("").getAbsolutePath();
+//				System.out.println(filePath);
+				
 				String strIn = e.getIn().getBody(String.class);
+				System.out.println(strIn);
 				
 				String[] arrayEvent = strIn.split("BEGIN:VEVENT");
 				
