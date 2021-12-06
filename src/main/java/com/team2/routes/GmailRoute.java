@@ -56,9 +56,7 @@ public class GmailRoute extends RouteBuilder {
 	
 	@Override
 	public void configure() throws Exception {
-		final String accessToken = (String) getJSONObjectFile("D:\\System_Integration\\RedHatFuseCode\\UET-Calendar-Integration\\src\\data\\google_auth.json")
-				.get("token");
-//		final String accessToken = "ya29.a0ARrdaM_3wBntL17-aCFW31ALq3BjW_SOufgpJ85_wI-8Sq3rB-4Oe2q1cK-OwiD6CjHfScctIlK3o4QxnphtD2v4byJXsDklMHDbp5g2YqWpmJ7Yx7-oksVngJD9vWhMsh5i9yoXFkaAXGSEqHwrsyNGmxlg";
+		
 		onException(Exception.class)
 		.handled(true)
 		.to("direct:rest-response/failure");
@@ -66,6 +64,8 @@ public class GmailRoute extends RouteBuilder {
 	
 		from("direct:google-gmail")
 		.process(e -> {
+			String accessToken = (String) getJSONObjectFile("./src/data/google_auth.json")
+					.get("token");
 			GoogleCredential credential = new GoogleCredential().setAccessToken(accessToken);
 			Gmail service = new Gmail.Builder(NET_HTTP_TRANSPORT, GSON_FACTORY, credential)
 		            .setApplicationName(APPLICATION_NAME)

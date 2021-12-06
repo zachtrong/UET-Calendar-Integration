@@ -1,9 +1,9 @@
 package com.team2.routes;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -17,14 +17,9 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.team2.model.MyEvent;
-import com.team2.model.UetAuthInfo;
-import com.team2.model.UetAuthToken;
 import com.team2.model.UetExportToken;
 
-import net.fortuna.ical4j.data.CalendarBuilder;
-import net.fortuna.ical4j.model.Calendar;
 
 public class UetCoursesCalendarRoute extends RouteBuilder {
 
@@ -41,16 +36,17 @@ public class UetCoursesCalendarRoute extends RouteBuilder {
 			.setHeader(Exchange.CONTENT_TYPE, constant("application/x-www-form-urlencoded"))
 			
 			.process(e -> 
-					e.getIn().setBody("wstoken=" + (String) getJSONObjectFile("/home/ngocpv22/workspace/UET-Calendar-Integration/src/data/uet_auth_token.json")
+					e.getIn().setBody("wstoken=" + (String) getJSONObjectFile("./src/data/uet_auth_token.json")
 									.get("token") + "&wsfunction=core_calendar_get_calendar_export_token"))
 			
 			.to("https://courses.uet.vnu.edu.vn/webservice/rest/server.php?moodlewsrestformat=json&bridgeEndpoint=true")
 			.unmarshal(new JacksonDataFormat(UetExportToken.class))
 			.process(e -> 
 			{
-				e.getIn().setHeader("exporttoken", e.getIn().getBody(UetExportToken.class).getToken());
-				int userid = ((Long) getJSONObjectFile("/home/ngocpv22/workspace/UET-Calendar-Integration/src/data/uet_auth_info.json")
+				int userid = ((Long) getJSONObjectFile("./src/data/uet_auth_info.json")
 						.get("userid")).intValue();
+				
+				e.getIn().setHeader("exporttoken", e.getIn().getBody(UetExportToken.class).getToken());
 				e.getIn().setHeader("userid", userid);
 			})	
 			.setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http.HttpMethods.GET))

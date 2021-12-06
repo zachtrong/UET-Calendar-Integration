@@ -44,8 +44,6 @@ public class GoogleCalendarRoute extends RouteBuilder {
 	
 	@Override
 	public void configure() throws Exception {
-		final String accessToken = (String) getJSONObjectFile("D:\\System_Integration\\RedHatFuseCode\\UET-Calendar-Integration\\src\\data\\google_auth.json")
-				.get("token");
 		
 		onException(Exception.class)
 		.handled(true)
@@ -54,6 +52,8 @@ public class GoogleCalendarRoute extends RouteBuilder {
 	
 		from("direct:google-calendar")
 		.process(e -> {
+			String accessToken = (String) getJSONObjectFile("./src/data/google_auth.json")
+					.get("token");
 			GoogleCredential credential = new GoogleCredential().setAccessToken(accessToken);
 			Calendar service = new Calendar.Builder(NET_HTTP_TRANSPORT, GSON_FACTORY, credential)
 		            .setApplicationName(APPLICATION_NAME)
