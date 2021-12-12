@@ -82,7 +82,7 @@ public class UetCoursesCalendarRoute extends RouteBuilder {
 					String _end = formatTimeFromEventUETCourses(end, 0);
 					String _start = formatTimeFromEventUETCourses(end, -1);
 					
-					MyEvent event = new MyEvent(title, _start, _end);
+					MyEvent event = new MyEvent("Deadline: "+ title, _start, _end);
 					listEvents.add(event);
 				}
 				e.getOut().setBody(listEvents);
