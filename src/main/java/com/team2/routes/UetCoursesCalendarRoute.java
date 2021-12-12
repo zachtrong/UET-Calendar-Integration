@@ -1,10 +1,12 @@
 package com.team2.routes;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,12 +18,16 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import com.google.gson.Gson;
 import com.team2.model.MyEvent;
 import com.team2.model.UetExportToken;
 
 
 public class UetCoursesCalendarRoute extends RouteBuilder {
+	
+	// TODO: Fill this function
+	public static boolean check_event_exist(String event_id) {
+		return false;
+	}
 
 	@Override
 	public void configure() throws Exception {
@@ -45,7 +51,6 @@ public class UetCoursesCalendarRoute extends RouteBuilder {
 			{
 				int userid = ((Long) getJSONObjectFile("./src/data/uet_auth_info.json")
 						.get("userid")).intValue();
-				
 				e.getIn().setHeader("exporttoken", e.getIn().getBody(UetExportToken.class).getToken());
 				e.getIn().setHeader("userid", userid);
 			})	
@@ -57,29 +62,42 @@ public class UetCoursesCalendarRoute extends RouteBuilder {
 				String strIn = e.getIn().getBody(String.class);
 				
 				String[] arrayEvent = strIn.split("BEGIN:VEVENT");
+				List<MyEvent> listEvents = new ArrayList<>();
 				
-				List<String> listEvents = new ArrayList<>();
 				
 				for(int i = 0; i < arrayEvent.length; i ++) {
 					if(arrayEvent[i].contains("METHOD:PUBLISH")) continue;
 					
+					String event_id = getValueByStringRegexFromEventUETCourses("UID:", arrayEvent[i]);
+					
+					if (check_event_exist(event_id)) {
+						continue;
+					}
+					
 					String title = getValueByStringRegexFromEventUETCourses("SUMMARY:", arrayEvent[i]);
-//					String description = getValueByStringRegexFromEventUETCourses("DESCRIPTION:", arrayEvent[i]);
-					String start = getValueByStringRegexFromEventUETCourses("DTSTART:", arrayEvent[i]);
+//					String start = getValueByStringRegexFromEventUETCourses("DTSTART:", arrayEvent[i]);
 					String end = getValueByStringRegexFromEventUETCourses("DTEND:", arrayEvent[i]);
 					
-					start = formatTimeFromEventUETCourses(start);
-					end = formatTimeFromEventUETCourses(end);
+//					start = formatTimeFromEventUETCourses(start);
+					String _end = formatTimeFromEventUETCourses(end, 0);
+					String _start = formatTimeFromEventUETCourses(end, -1);
 					
-					MyEvent event = new MyEvent(title, start, end);
-					Gson gson = new Gson();
-					String jsonObjectEvent = gson.toJson(event);
-					
-					listEvents.add(jsonObjectEvent);
+					MyEvent event = new MyEvent(title, _start, _end);
+					listEvents.add(event);
 				}
-				
 				e.getOut().setBody(listEvents);
+				e.getOut().setHeader("loop", listEvents.size());
 			})
+			.loop(header("loop")).copy()
+				.process(e -> {
+					int i = (Integer) e.getProperty(Exchange.LOOP_INDEX);
+					List<MyEvent> listEvents = e.getIn().getBody(List.class);
+					MyEvent event = listEvents.get(i);
+					e.getOut().setBody(event);
+				})
+				.to("direct:google-calendar-push-event")
+			.end()
+			.setBody(p -> "Synchonize with Google Calendar completed!!!")
 			.to("log:com.team2.routes?level=INFO");
 	}
 	
@@ -105,16 +123,20 @@ public class UetCoursesCalendarRoute extends RouteBuilder {
 		return jsonObject;
 	}
 	
-	public static String formatTimeFromEventUETCourses(String time) {
+	public static String formatTimeFromEventUETCourses(String time, int sub_hour) throws java.text.ParseException {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
+		Date timestamp = dateFormat.parse(time);
+		
+		if (sub_hour != 0) {
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(timestamp);
+			cal.add(Calendar.HOUR, sub_hour);
+			timestamp = cal.getTime();
+		}
+		String formattedDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(timestamp);
+		return formattedDate;
 
-        String year = time.substring(0, 4);
-        String month = time.substring(4, 6);
-        String day = time.substring(6, 8);
-        String hour = String.valueOf(Integer.valueOf(time.substring(9, 11)) + 7);
-        String minutes = time.substring(11, 13);
-        String second = time.substring(13, 15);
-
-//        return year + "-" + month + "-" + day + " " + hour + ":" + minutes + ":" + second;
-        return year + "-" + month + "-" + day;
+//        return year + "-" + month + "-" + day + " " + hour + ":" + minutes + ":" + second + ".0000";
+//        return year + "-" + month + "-" + day;
     }
 }

@@ -53,6 +53,12 @@ public class GmailRoute extends RouteBuilder {
 		return jsonObject;
 	}
 	
+	// TODO: Fill this function
+	public static boolean check_event_exists(String gmail_id) {
+		return false;
+	}
+		
+	
 	
 	@Override
 	public void configure() throws Exception {
@@ -65,16 +71,26 @@ public class GmailRoute extends RouteBuilder {
 		from("direct:google-gmail")
 		.process(e -> {
 			String accessToken = (String) getJSONObjectFile("./src/data/google_auth.json")
-					.get("token");
-			GoogleCredential credential = new GoogleCredential().setAccessToken(accessToken);
+					.get("access_token");
+			String refreshToken = (String) getJSONObjectFile("./src/data/google_auth.json")
+					.get("refresh_token");
+			GoogleCredential credential = new GoogleCredential().setAccessToken(accessToken).setRefreshToken(refreshToken);
 			Gmail service = new Gmail.Builder(NET_HTTP_TRANSPORT, GSON_FACTORY, credential)
 		            .setApplicationName(APPLICATION_NAME)
 		            .build();
 		    
-		    // Print the labels in the user's account.
-		    String user = "me";
-		    ListMessagesResponse listMessages = service.users().messages().list(user).execute();
-		    List<Message> messages = listMessages.getMessages();
+			// Recusively take UNREAD email only
+		    ListMessagesResponse response = service.users().messages().list("me").setQ("is:unread in:inbox").execute();
+	        List<Message> messages = new ArrayList<Message>();
+	        while (response.getMessages() != null) {
+	            messages.addAll(response.getMessages());
+	            if (response.getNextPageToken() != null) {
+	                String pageToken = response.getNextPageToken();
+	                response = service.users().messages().list("me").setQ("is:unread in:inbox").setPageToken(pageToken).execute();
+	            } else {
+	                break;
+	            }
+	        }
 		    
 		    if (messages.isEmpty()) {
 		        System.out.println("No messages found.");
@@ -84,6 +100,11 @@ public class GmailRoute extends RouteBuilder {
 		        for (Message message : messages) {
 		        	Message detail = service.users().messages().get("me", message.getId()).setFormat("full").execute();
 		            System.out.printf("- %s\n", detail.getSnippet());
+		            // check event exists in db 
+		            // exists -> continue
+		            if (check_event_exists(message.getId())) {
+		            	continue;
+		            }
 		            List<String> dates = getDate(detail.getSnippet());
 		            if (dates.size() == 1) {
 		                String end_time = dates.get(0);
@@ -91,17 +112,16 @@ public class GmailRoute extends RouteBuilder {
 		                Gson gson = new Gson();
 						String jsonObjectEvent = gson.toJson(event);
 		                listEvents.add(jsonObjectEvent);
-		                System.out.println(end_time);
+		                // push to calendar
 		            }
 		            else if(dates.size() >= 2) {
 		                String start_time = dates.get(0);
 		                String end_time = dates.get(1);
-		                System.out.println(start_time);
-		                System.out.println(end_time);
 		                MyEvent event = new MyEvent("Date from gmail", start_time, end_time);
 		                Gson gson = new Gson();
 						String jsonObjectEvent = gson.toJson(event);
 		                listEvents.add(jsonObjectEvent);
+		                // push to calendar
 		            }
 		            else {
 		                System.out.println("Khong co ngay thang trong mail");

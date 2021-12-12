@@ -17,6 +17,7 @@ import org.json.simple.parser.ParseException;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.Events;
 import com.google.gson.Gson;
 
@@ -42,27 +43,62 @@ public class GoogleCalendarRoute extends RouteBuilder {
 	}
 	
 	
+	public static Calendar init_connection() throws Exception {
+		String accessToken = (String) getJSONObjectFile("./src/data/google_auth.json")
+				.get("access_token");
+		String refreshToken = (String) getJSONObjectFile("./src/data/google_auth.json")
+				.get("refresh_token");
+		GoogleCredential credential = new GoogleCredential().setAccessToken(accessToken);
+		Calendar service = new Calendar.Builder(NET_HTTP_TRANSPORT, GSON_FACTORY, credential)
+	            .setApplicationName(APPLICATION_NAME)
+	            .build();
+		return service;
+	}
+	
+	
 	@Override
 	public void configure() throws Exception {
 		
 		onException(Exception.class)
 		.handled(true)
 		.to("direct:rest-response/failure");
+		
+		from("direct:google-calendar-push-event")
+		.process(e -> {
+			System.out.println("START PUSHING EVENT TO CALENDAR");
+			Calendar service = init_connection();
+			MyEvent my_event = e.getIn().getBody(MyEvent.class);
+			
+			Event event = new Event()
+				    .setSummary(my_event.getTitle());
+			
+			DateTime startDateTime = new DateTime(my_event.getStart());
+			EventDateTime start = new EventDateTime()
+			    .setDateTime(startDateTime)
+			    .setTimeZone("Asia/Ho_Chi_Minh");
+			event.setStart(start);
+
+			DateTime endDateTime = new DateTime(my_event.getEnd());
+			EventDateTime end = new EventDateTime()
+			    .setDateTime(endDateTime)
+			    .setTimeZone("Asia/Ho_Chi_Minh");
+			event.setEnd(end);
+			
+			String calendarId = "primary";
+			event = service.events().insert(calendarId, event).execute();
+			
+		}).to("log:com.team2.routes?level=INFO");
 	
 	
 		from("direct:google-calendar")
+		.to("direct:google-gmail", "direct:uet-courses-calendar")
 		.process(e -> {
-			String accessToken = (String) getJSONObjectFile("./src/data/google_auth.json")
-					.get("token");
-			GoogleCredential credential = new GoogleCredential().setAccessToken(accessToken);
-			Calendar service = new Calendar.Builder(NET_HTTP_TRANSPORT, GSON_FACTORY, credential)
-		            .setApplicationName(APPLICATION_NAME)
-		            .build();
+			Calendar service = init_connection();
 
 			// List the next 10 events from the primary calendar.
 		    DateTime now = new DateTime(System.currentTimeMillis());
 		    Events events = service.events().list("primary")
-		            .setMaxResults(10)
+//		            .setMaxResults(30)
 		            .setTimeMin(now)
 		            .setOrderBy("startTime")
 		            .setSingleEvents(true)
@@ -86,6 +122,7 @@ public class GoogleCalendarRoute extends RouteBuilder {
 	                Gson gson = new Gson();
 					String jsonObjectEvent = gson.toJson(_event);
 	                listEvents.add(jsonObjectEvent);
+	                
 		        }     
 		        e.getOut().setBody(listEvents);
 		    }

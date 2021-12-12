@@ -1,11 +1,7 @@
 package com.team2.routes;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
@@ -14,7 +10,6 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
 import org.apache.commons.io.IOUtils;
 
-import com.team2.model.GoogleAuthToken;
 
 public class WebServiceRoute extends RouteBuilder {
 
@@ -57,18 +52,9 @@ public class WebServiceRoute extends RouteBuilder {
 			});
 		
 		rest("/rest")
-			.post("/uet-auth").to("direct:uet-auth");
-		
-		rest("/rest")
-			.post("/google-auth").to("direct:google-auth");
-		
-		rest("/rest")
-			.post("/microsoft-auth").to("direct:microsoft-auth");
-		
-		rest("/rest")
-			.get("/uet-courses-calendar").to("direct:uet-courses-calendar");
-		rest("/rest")
-			.get("/google-gmail").to("direct:google-gmail");
+			.post("/uet-auth").to("direct:uet-auth");	
+//		rest("/rest")
+//			.get("/uet-calendar").to("direct:uet-courses-calendar");
 		rest("/rest")
 			.get("/google-calendar").to("direct:google-calendar");
 	}
