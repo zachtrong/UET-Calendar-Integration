@@ -1,0 +1,76 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+
+  min-height: 100vh;
+  display: flex;
+  font-weight: 400;
+  font-family: sans-serif;
+  background: scroll center url("../img/background3.jpg");
+  
+}
+
+body, html, .App, #root, .outer {
+  width: 100%;
+  height: 100%;
+}
+
+.navbar-light {
+  background-color: #ffffff;
+  box-shadow: 0px 20px 80px rgba(34, 35, 58, 0.2);
+}
+.navbar-nav{
+  margin-left: 850px;
+}
+
+.outer {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  text-align: left;
+}
+
+.inner {
+  width: 450px;
+  margin: auto;
+  /* box-shadow: 10px 20px 90px rgba(100, 65, 0.5); */
+  background-color:rgb(255,255,255);
+  border-radius: 10px;
+  transition: all .3s;
+}
+
+.outer h3 {
+  text-align: center;
+  margin: 15px;
+  line-height: 1;
+  padding-bottom: 20px;
+}
+
+.custom-control-label {
+  font-weight: 400;
+}
+.form-control{
+  margin: 10px;
+  width:350px;
+  border:1px solid gray;
+  border-radius: 10px;
+}
+.form-group{
+  margin: 30px;
+}
+.form-control__submit{
+  margin: 30px;
+  margin-left:65px;
+}
+.form-control__submit2{
+  text-align:center;
+  color:black;
+  margin-right: 20px;
+  margin-bottom: 150px;
+}
+.form-control__submit3{
+  margin-top: -150px;
+  display:flex;
+}
